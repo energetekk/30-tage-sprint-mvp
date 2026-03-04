@@ -145,6 +145,7 @@ export default function Dashboard() {
   const sprintStatus = getSprintStatus()
   const daysSinceTag0 = calculateDaysSinceTag0()
   const showQuickValidation = daysSinceTag0 !== null && daysSinceTag0 < 3 && !validationSaved
+  const canEditOnboarding = daysSinceTag0 !== null && daysSinceTag0 < 3
 
   return (
     <div style={styles.container}>
@@ -347,13 +348,27 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Quick Links */}
+      {/* Community & Quick Links */}
       <div style={styles.quickLinks}>
-        <a href="/onboarding" style={styles.link}>
-          ✏️ Onboarding bearbeiten
-        </a>
-        <a href="/test-supabase" style={styles.link}>
-          📊 Alle User ansehen
+        {/* Onboarding Edit - nur während Warmup */}
+        {canEditOnboarding ? (
+          <a href="/onboarding" style={styles.link}>
+            ✏️ Onboarding bearbeiten
+          </a>
+        ) : (
+          <span style={{...styles.link, opacity: 0.5, cursor: 'not-allowed'}} title="Nur bis Tag 2 editierbar">
+            🔒 Onboarding (locked)
+          </span>
+        )}
+        
+        {/* Telegram Community - immer sichtbar */}
+        <a 
+          href="https://t.me/+bQLoydJB1ilmYTc0" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          style={{...styles.link, backgroundColor: '#0088cc', color: 'white', border: 'none'}}
+        >
+          💬 Telegram Gruppe
         </a>
       </div>
     </div>
@@ -592,16 +607,20 @@ const styles = {
     margin: '30px auto',
     display: 'flex',
     gap: '15px',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    flexWrap: 'wrap'
   },
   link: {
-    padding: '10px 20px',
+    padding: '12px 24px',
     backgroundColor: 'white',
     color: '#2563eb',
     textDecoration: 'none',
     borderRadius: '8px',
     fontSize: '14px',
-    border: '1px solid #e5e7eb'
+    fontWeight: '500',
+    border: '2px solid #e5e7eb',
+    transition: 'all 0.2s',
+    display: 'inline-block'
   },
   button: {
     display: 'inline-block',
