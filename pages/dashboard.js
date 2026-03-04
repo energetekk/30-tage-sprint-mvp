@@ -363,7 +363,7 @@ export default function Dashboard() {
         
         {/* Telegram Community - immer sichtbar */}
         <a 
-          href="https://t.me/+bQLoydJB1ilmYTc0" 
+          href="https://t.me/+DEIN_TELEGRAM_LINK" 
           target="_blank" 
           rel="noopener noreferrer"
           style={{...styles.link, backgroundColor: '#0088cc', color: 'white', border: 'none'}}
