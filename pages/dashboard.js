@@ -4,12 +4,6 @@ import { supabase } from '../lib/supabase'
 export default function Dashboard() {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [quickValidation, setQuickValidation] = useState({
-    q1: '',
-    q2: '',
-    q3: ''
-  })
-  const [validationSaved, setValidationSaved] = useState(false)
 
   useEffect(() => {
     fetchUser()
@@ -17,21 +11,21 @@ export default function Dashboard() {
 
   async function fetchUser() {
     try {
-      const testUserId = '16b30cac-9ecb-49e2-97ff-15d39eacda75'
+      const { data: { user: authUser } } = await supabase.auth.getUser()
       
+      if (!authUser) {
+        window.location.href = '/login'
+        return
+      }
+
       const { data, error } = await supabase
         .from('users')
         .select('*')
-        .eq('id', testUserId)
+        .eq('email', authUser.email)
         .single()
 
       if (error) throw error
-
       setUser(data)
-      
-      if (data.quick_validation) {
-        setValidationSaved(true)
-      }
     } catch (error) {
       console.error('Error:', error)
       alert('Fehler beim Laden: ' + error.message)
@@ -40,38 +34,40 @@ export default function Dashboard() {
     }
   }
 
-  function calculateDaysSinceTag0() {
-    if (!user?.tag0_completed_at) return null
+  function calculateDaysSinceAcceptance() {
+    if (!user?.accepted_at) return null
     
-    const tag0Date = new Date(user.tag0_completed_at)
+    const acceptedDate = new Date(user.accepted_at)
     const now = new Date()
-    const diffMs = now - tag0Date
+    const diffMs = now - acceptedDate
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
     
     return diffDays
   }
 
   function getSprintStatus() {
-    const days = calculateDaysSinceTag0()
+    const days = calculateDaysSinceAcceptance()
     
     if (days === null) {
       return {
         status: 'not_started',
-        message: 'Onboarding noch nicht abgeschlossen',
+        message: 'Fehler: Kein Akzeptanz-Datum',
         color: '#ef4444'
       }
     }
     
-    if (days < 3) {
+    // Tag 0 = Akzeptanz-Tag (heute)
+    if (days === 0) {
       return {
-        status: 'waiting',
-        message: `Sprint startet in ${3 - days} Tag${3 - days === 1 ? '' : 'en'}`,
-        daysRemaining: 3 - days,
+        status: 'ready',
+        message: 'Sprint startet morgen!',
+        daysRemaining: 1,
         color: '#f59e0b'
       }
     }
     
-    const sprintDay = days - 2
+    // Tag 1+ = Sprint läuft
+    const sprintDay = days
     const maxDays = user.module === 'bronze' ? 13 : 
                     user.module === 'silber' ? 21 : 
                     user.module === 'gold' ? 30 : 60
@@ -94,30 +90,6 @@ export default function Dashboard() {
     }
   }
 
-  async function saveQuickValidation() {
-    if (!quickValidation.q1 || !quickValidation.q2 || !quickValidation.q3) {
-      alert('Bitte alle 3 Fragen beantworten!')
-      return
-    }
-
-    try {
-      const { error } = await supabase
-        .from('users')
-        .update({
-          quick_validation: quickValidation,
-          quick_validation_completed_at: new Date().toISOString()
-        })
-        .eq('id', user.id)
-
-      if (error) throw error
-
-      setValidationSaved(true)
-      alert('✅ Quick-Validation gespeichert!')
-    } catch (error) {
-      alert('Fehler: ' + error.message)
-    }
-  }
-
   if (loading) {
     return (
       <div style={styles.container}>
@@ -133,9 +105,9 @@ export default function Dashboard() {
       <div style={styles.container}>
         <div style={styles.errorBox}>
           <h2>❌ User nicht gefunden</h2>
-          <p>Bitte erst Onboarding ausfüllen!</p>
-          <a href="/onboarding" style={styles.button}>
-            Zum Onboarding →
+          <p>Bitte erst bewerben!</p>
+          <a href="/beta" style={styles.button}>
+            Zur Bewerbung →
           </a>
         </div>
       </div>
@@ -143,9 +115,7 @@ export default function Dashboard() {
   }
 
   const sprintStatus = getSprintStatus()
-  const daysSinceTag0 = calculateDaysSinceTag0()
-  const showQuickValidation = daysSinceTag0 !== null && daysSinceTag0 < 3 && !validationSaved
-  const canEditOnboarding = daysSinceTag0 !== null && daysSinceTag0 < 3
+  const daysSinceAcceptance = calculateDaysSinceAcceptance()
 
   return (
     <div style={styles.container}>
@@ -168,7 +138,7 @@ export default function Dashboard() {
             ...styles.badge,
             backgroundColor: sprintStatus.color
           }}>
-            {sprintStatus.status === 'waiting' ? 'Vorbereitung' :
+            {sprintStatus.status === 'ready' ? 'Bereit' :
              sprintStatus.status === 'active' ? 'Aktiv' :
              sprintStatus.status === 'completed' ? 'Abgeschlossen' : 'Wartend'}
           </span>
@@ -187,14 +157,13 @@ export default function Dashboard() {
           </div>
         )}
 
-        {sprintStatus.status === 'waiting' && (
+        {sprintStatus.status === 'ready' && (
           <div style={styles.countdownBox}>
-            <div style={styles.countdownNumber}>
-              {sprintStatus.daysRemaining}
-            </div>
-            <div style={styles.countdownLabel}>
-              Tag{sprintStatus.daysRemaining === 1 ? '' : 'e'} bis Sprint-Start
-            </div>
+            <div style={styles.countdownNumber}>1</div>
+            <div style={styles.countdownLabel}>Tag bis Sprint-Start</div>
+            <p style={{marginTop: '20px', fontSize: '16px', color: '#92400e'}}>
+              Morgen erhältst du deinen ersten Prompt per Email!
+            </p>
           </div>
         )}
       </div>
@@ -217,153 +186,19 @@ export default function Dashboard() {
           </div>
           <div style={styles.infoRow}>
             <span style={styles.infoLabel}>Skill-Level:</span>
-            <span style={styles.infoBadge}>
-              {user.skill_level}
-            </span>
+            <span style={styles.infoBadge}>{user.skill_level}</span>
+          </div>
+          <div style={styles.infoRow}>
+            <span style={styles.infoLabel}>Produkttyp:</span>
+            <span style={styles.infoBadge}>{user.product_type}</span>
           </div>
         </div>
       </div>
 
-      {/* Quick-Validation */}
-      {showQuickValidation && (
-        <div style={styles.card}>
-          <div style={styles.validationHeader}>
-            <h3 style={styles.cardTitle}>
-              🎯 Quick-Validation (Optional)
-            </h3>
-            <span style={styles.optionalBadge}>Optional</span>
-          </div>
-          <p style={styles.validationSubtitle}>
-            Nutze die Wartezeit um dein Projekt zu validieren! (je 5 Min)
-          </p>
-
-          <div style={styles.questionBox}>
-            <label style={styles.questionLabel}>
-              1. Wer hat dieses Problem auch?
-            </label>
-            <textarea
-              value={quickValidation.q1}
-              onChange={(e) => setQuickValidation({...quickValidation, q1: e.target.value})}
-              style={styles.textarea}
-              placeholder="z.B. Freelancer, Studenten, Gründer..."
-              rows={2}
-            />
-          </div>
-
-          <div style={styles.questionBox}>
-            <label style={styles.questionLabel}>
-              2. Was ist die simpleste Lösung?
-            </label>
-            <textarea
-              value={quickValidation.q2}
-              onChange={(e) => setQuickValidation({...quickValidation, q2: e.target.value})}
-              style={styles.textarea}
-              placeholder="MVP ohne Schnickschnack..."
-              rows={2}
-            />
-          </div>
-
-          <div style={styles.questionBox}>
-            <label style={styles.questionLabel}>
-              3. Womit könntest du heute starten?
-            </label>
-            <textarea
-              value={quickValidation.q3}
-              onChange={(e) => setQuickValidation({...quickValidation, q3: e.target.value})}
-              style={styles.textarea}
-              placeholder="Konkrete erste Schritte..."
-              rows={2}
-            />
-          </div>
-
-          <button 
-            onClick={saveQuickValidation}
-            style={styles.saveButton}
-          >
-            💾 Speichern
-          </button>
-        </div>
-      )}
-
-      {validationSaved && (
-        <div style={styles.successCard}>
-          ✅ Quick-Validation gespeichert! Super vorbereitet! 🎉
-        </div>
-      )}
-
-      {/* Next Steps */}
-      <div style={styles.card}>
-        <h3 style={styles.cardTitle}>Was passiert als nächstes?</h3>
-        <div style={styles.nextSteps}>
-          {sprintStatus.status === 'waiting' && (
-            <>
-              <div style={styles.step}>
-                <div style={styles.stepNumber}>1</div>
-                <div>
-                  <strong>Jetzt:</strong> Bereite dich mental vor. 
-                  Optional: Quick-Validation oben ausfüllen.
-                </div>
-              </div>
-              <div style={styles.step}>
-                <div style={styles.stepNumber}>2</div>
-                <div>
-                  <strong>Tag 4:</strong> Dein Sprint startet! 
-                  Du bekommst deinen ersten Prompt per Email.
-                </div>
-              </div>
-              <div style={styles.step}>
-                <div style={styles.stepNumber}>3</div>
-                <div>
-                  <strong>Täglich:</strong> 30-45 Min am Projekt arbeiten.
-                </div>
-              </div>
-            </>
-          )}
-          
-          {sprintStatus.status === 'active' && (
-            <>
-              <div style={styles.step}>
-                <div style={styles.stepNumber}>✓</div>
-                <div>
-                  <strong>Sprint läuft!</strong> Check deine Emails für den heutigen Prompt.
-                </div>
-              </div>
-              <div style={styles.step}>
-                <div style={styles.stepNumber}>📅</div>
-                <div>
-                  <strong>Tag {sprintStatus.currentDay}:</strong> Arbeite heute 30-45 Min.
-                </div>
-              </div>
-            </>
-          )}
-
-          {sprintStatus.status === 'completed' && (
-            <div style={styles.step}>
-              <div style={styles.stepNumber}>🎉</div>
-              <div>
-                <strong>Gratulation!</strong> Du hast den Sprint abgeschlossen!
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Community & Quick Links */}
+      {/* Community Link */}
       <div style={styles.quickLinks}>
-        {/* Onboarding Edit - nur während Warmup */}
-        {canEditOnboarding ? (
-          <a href="/onboarding" style={styles.link}>
-            ✏️ Onboarding bearbeiten
-          </a>
-        ) : (
-          <span style={{...styles.link, opacity: 0.5, cursor: 'not-allowed'}} title="Nur bis Tag 2 editierbar">
-            🔒 Onboarding (locked)
-          </span>
-        )}
-        
-        {/* Telegram Community - immer sichtbar */}
         <a 
-          href="https://t.me/+DEIN_TELEGRAM_LINK" 
+          href="https://t.me/+bQLoydJB1ilmYTc0" 
           target="_blank" 
           rel="noopener noreferrer"
           style={{...styles.link, backgroundColor: '#0088cc', color: 'white', border: 'none'}}
@@ -484,7 +319,8 @@ const styles = {
   },
   countdownLabel: {
     fontSize: '18px',
-    color: '#92400e'
+    color: '#92400e',
+    fontWeight: '600'
   },
   projectInfo: {
     display: 'flex',
@@ -514,93 +350,6 @@ const styles = {
     borderRadius: '12px',
     fontSize: '13px',
     fontWeight: '500'
-  },
-  validationHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '10px'
-  },
-  optionalBadge: {
-    padding: '4px 10px',
-    backgroundColor: '#fef3c7',
-    color: '#92400e',
-    borderRadius: '12px',
-    fontSize: '12px',
-    fontWeight: '500'
-  },
-  validationSubtitle: {
-    fontSize: '14px',
-    color: '#666',
-    marginBottom: '25px'
-  },
-  questionBox: {
-    marginBottom: '20px'
-  },
-  questionLabel: {
-    display: 'block',
-    fontSize: '14px',
-    fontWeight: '500',
-    color: '#374151',
-    marginBottom: '8px'
-  },
-  textarea: {
-    width: '100%',
-    padding: '12px',
-    fontSize: '14px',
-    border: '1px solid #d1d5db',
-    borderRadius: '8px',
-    outline: 'none',
-    fontFamily: 'inherit',
-    resize: 'vertical',
-    boxSizing: 'border-box'
-  },
-  saveButton: {
-    width: '100%',
-    padding: '12px',
-    fontSize: '16px',
-    fontWeight: '600',
-    color: 'white',
-    backgroundColor: '#2563eb',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    marginTop: '10px'
-  },
-  successCard: {
-    maxWidth: '900px',
-    margin: '0 auto 20px',
-    padding: '20px',
-    backgroundColor: '#d1fae5',
-    border: '2px solid #10b981',
-    borderRadius: '12px',
-    textAlign: 'center',
-    fontSize: '16px',
-    color: '#065f46'
-  },
-  nextSteps: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '15px'
-  },
-  step: {
-    display: 'flex',
-    gap: '15px',
-    padding: '15px',
-    backgroundColor: '#f9fafb',
-    borderRadius: '8px'
-  },
-  stepNumber: {
-    width: '32px',
-    height: '32px',
-    borderRadius: '50%',
-    backgroundColor: '#2563eb',
-    color: 'white',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontWeight: 'bold',
-    flexShrink: 0
   },
   quickLinks: {
     maxWidth: '900px',

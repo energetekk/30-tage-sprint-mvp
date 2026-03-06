@@ -10,10 +10,10 @@ export default function Home() {
       backgroundColor: '#f3f4f6'
     }}>
       <h1 style={{ fontSize: '48px', marginBottom: '20px' }}>
-        30-Tage-Sprint 🚀
+        KI MVP Betriebssystem 🚀
       </h1>
       <p style={{ fontSize: '20px', color: '#666', marginBottom: '40px' }}>
-        Beta in Entwicklung
+        Ausführungs-System für MVP Launch in Entwicklung
       </p>
       
       <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', justifyContent: 'center' }}>
@@ -29,7 +29,7 @@ export default function Home() {
           📊 Dashboard
         </a>
         
-        <a href="/onboarding" style={{
+        <a href="/pipeline" style={{
           padding: '14px 28px',
           backgroundColor: '#059669',
           color: 'white',
@@ -38,7 +38,7 @@ export default function Home() {
           fontWeight: '600',
           fontSize: '16px'
         }}>
-          📝 Onboarding
+          📝 Bewerbung
         </a>
         
         <a href="/test-supabase" style={{
