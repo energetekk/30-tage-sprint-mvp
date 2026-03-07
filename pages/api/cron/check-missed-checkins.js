@@ -35,9 +35,7 @@ export default async function handler(req, res) {
 
     console.log(`📊 Found ${users.length} active users`)
 
-    let remindersS
-
-ent = 0
+    let remindersSent = 0
     let usersPaused = 0
 
     for (const user of users) {
@@ -156,7 +154,7 @@ ent = 0
               `
             })
 
-            reminders Sent++
+            remindersSent++
             console.log(`📧 Reminder sent: ${user.email} (missed ${newMissedCount} days)`)
           }
         }
@@ -166,7 +164,7 @@ ent = 0
       }
     }
 
-    console.log(`✅ Cron finished: ${remindersen} reminders, ${usersPaused} users paused`)
+    console.log(`✅ Cron finished: ${remindersSent} reminders, ${usersPaused} users paused`)
 
     res.status(200).json({
       success: true,
