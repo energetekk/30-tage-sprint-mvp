@@ -27,7 +27,7 @@ export default async function handler(req, res) {
     
     const result = await resend.emails.send({
       from: 'MVP Buildr <onboarding@resend.dev>',
-      to: 'igilepic@gmail.com', // ← DEINE EMAIL HIER
+      to: 'energetekk@proton.me', // ← DEINE EMAIL HIER
       subject: '🔔 Neue Beta-Bewerbung - TEST',
       html: `
         <h2>Neue Bewerbung eingegangen!</h2>

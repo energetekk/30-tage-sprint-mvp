@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/send-daily-prompts",
+      "schedule": "0 5 * * *"
+    },
+    {
+      "path": "/api/cron/check-missed-checkins",
+      "schedule": "0 6 * * *"
+    }
+  ]
+}
