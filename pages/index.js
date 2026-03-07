@@ -10,10 +10,10 @@ export default function Home() {
       backgroundColor: '#f3f4f6'
     }}>
       <h1 style={{ fontSize: '48px', marginBottom: '20px' }}>
-        KI MVP Betriebssystem 🚀
+        AI Execution Operating Framework 🚀
       </h1>
       <p style={{ fontSize: '20px', color: '#666', marginBottom: '40px' }}>
-        Ausführungs-System für MVP Launch in Entwicklung
+        Founder Execution Control System für MVP Launch in Entwicklung
       </p>
       
       <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', justifyContent: 'center' }}>
