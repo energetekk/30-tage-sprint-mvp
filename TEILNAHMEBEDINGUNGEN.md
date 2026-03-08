@@ -9,7 +9,7 @@
 
 ### 1.1 Berechtigung
 - Die Teilnahme steht allen Personen ab 18 Jahren offen
-- Die Teilnahme ist während der Beta-Phase kostenlos
+- Die Teilnahme ist während der COHORT#1-Phase kostenlos
 - Die Anmeldung ist verbindlich für die gesamte Sprintdauer
 
 ### 1.2 Auswahl
