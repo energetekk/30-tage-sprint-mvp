@@ -147,6 +147,7 @@ export default function Pipeline() {
       field: 'privacy_consent',
       type: 'checkbox',
       label: 'Ich stimme der Datenschutzerklärung zu',
+      link: 'https://github.com/energetekk/30-Tage-Finish-Sprint-Oeffentlicher-Log/blob/main/Datenschutzerklaerung.md',
       required: true
     },
     {
@@ -156,6 +157,7 @@ export default function Pipeline() {
       field: 'terms_consent',
       type: 'checkbox',
       label: 'Ich akzeptiere die Teilnahmebedingungen',
+      link: 'https://github.com/energetekk/30-tage-sprint-mvp/blob/main/TEILNAHMEBEDINGUNGEN.md', // TODO: Link zu Teilnahmebedingungen
       required: true
     }
   ]
@@ -251,8 +253,8 @@ export default function Pipeline() {
         console.log('Admin notification sent')
       }
 
-      // Redirect to login with success message
-      router.push('/login?bewerbung=erfolg')
+      // Redirect to success page
+      router.push(`/success?email=${encodeURIComponent(formData.email)}`)
 
     } catch (error) {
       console.error('Submit error:', error)
@@ -331,7 +333,20 @@ export default function Pipeline() {
             onChange={(e) => setFormData({ ...formData, [step.field]: e.target.checked })}
             style={styles.checkbox}
           />
-          <span style={styles.checkboxText}>{step.label}</span>
+          <span style={styles.checkboxText}>
+            {step.label.split(' zu')[0]} zu{' '}
+            {step.link && (
+              <a 
+                href={step.link} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={styles.link}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {step.field === 'privacy_consent' ? 'Datenschutzerklärung' : 'Teilnahmebedingungen'}
+              </a>
+            )}
+          </span>
         </label>
       )
     }
@@ -492,6 +507,11 @@ const styles = {
     fontSize: '16px',
     lineHeight: '1.5',
     color: '#374151'
+  },
+  link: {
+    color: '#2563eb',
+    textDecoration: 'underline',
+    fontWeight: '600'
   },
   navigation: {
     display: 'flex',
