@@ -1,7 +1,7 @@
 # Teilnahmebedingungen MVP Buildr Sprint
 
 **Stand:** März 2026  
-**Gültig für:** Beta-Phase (kostenlose Teilnahme)
+**Gültig für:** COHORT#1-Phase (kostenlose Teilnahme)
 
 ---
 
