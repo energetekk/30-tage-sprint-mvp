@@ -130,14 +130,14 @@ Mit der Teilnahme stimmst du zu dass:
 
 ## 8. Kosten
 
-### 8.1 Beta-Phase
-- Teilnahme ist während Beta kostenlos
+### 8.1 COHORT#1-Phase
+- Teilnahme ist während COHORT#1 kostenlos
 - Keine versteckten Kosten
 - Keine Upsells während des Sprints
 
 ### 8.2 Zukünftige Cohorts
 - Spätere Cohorts könnten kostenpflichtig sein
-- Beta-Teilnehmer werden bevorzugt informiert
+- COHORT#1-Teilnehmer werden bevorzugt informiert
 - Keine Verpflichtung zur Teilnahme
 
 ---
