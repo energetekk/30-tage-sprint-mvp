@@ -44,7 +44,7 @@ Die Zuteilung erfolgt automatisch basierend auf deinem Skill-Level und Projektph
 ### 3.2 Proofs (Nachweise)
 An Meilenstein-Tagen musst du Nachweise einreichen:
 - Tag 7: Zwischenstand (automatisch genehmigt)
-- Tag 13/21/30: Finaler Proof (manuelle Prüfung)
+- Tag 13/14/21/30: Finaler Proof (manuelle Prüfung)
 
 Nachweise können sein:
 - Screenshots deines Projekts
@@ -121,7 +121,7 @@ Mit der Teilnahme stimmst du zu dass:
 
 ## 7. Datenschutz
 
-- Siehe separate [Datenschutzerklärung](LINK)
+- Siehe separate [Datenschutzerklärung](https://github.com/energetekk/30-Tage-Finish-Sprint-Oeffentlicher-Log/blob/main/Datenschutzerklaerung.md)
 - Deine Daten werden vertraulich behandelt
 - Keine Weitergabe an Dritte
 - Du kannst jederzeit Auskunft verlangen
@@ -175,7 +175,7 @@ Du kannst jederzeit abbrechen:
 
 Bei Fragen zu den Teilnahmebedingungen:
 - **Email:** energetekk@proton.me
-- **Telegram:** Sprint-Gruppe
+- **Telegram:** Sprint-Gruppe tba
 - **Antwortzeit:** Innerhalb 48h
 
 ---
