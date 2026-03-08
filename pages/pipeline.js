@@ -36,17 +36,17 @@ export default function Pipeline() {
     
     // Projekt Phase Score
     const phaseScores = {
-      'nur_idee': 1,
-      'konzept': 2,
-      'begonnen': 2,
-      'fast_fertig': 1
+      'nur_idee': 1,      // Am Anfang → weniger Zeit
+      'konzept': 2,       // Konzept da → Zeit für Build
+      'begonnen': 2,      // Schon begonnen → Weiter ausbauen
+      'fast_fertig': 3    // Fast fertig → Quality + Polish (MEHR Zeit!)
     }
     score += phaseScores[projectPhase] || 0
     
     // Modul basierend auf Score
-    if (score <= 3) return 'bronze'
-    if (score <= 5) return 'silber'
-    return 'gold'
+    if (score <= 3) return 'bronze'   // 2-3 Punkte
+    if (score <= 5) return 'silber'   // 4-5 Punkte
+    return 'gold'                      // 6+ Punkte
   }
 
   const steps = [
